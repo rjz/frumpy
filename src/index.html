@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Three Playgrounds</h1>
+
+    <div class="container">
+      <h3>Playground 1
+        <small>(<code>keyup</code>, <code>mousedown</code>)</small>
+      </h3>
+      <div class="playground1">
+        <p data-name="foo"></p>
+        <p data-name="keysPressed" class="p1"></p>
+      </div>
+    </div>
+
+    <div class="container">
+      <h3>Playground 2
+        <small>(<code>xhr.onload</code>, <code>input:change</code>)</small>
+      </h3>
+      <div class="playground2">
+        <p>Received @ <span data-name="time"></span></p>
+        <form>
+          <label for="hello"></label>
+          <input id="hello" data-name="hello" type="text" />
+        </form>
+        <p data-name="keysPressed"></p>
+      </div>
+    </div>
+
+    <div class="container">
+      <h3>Playground 3
+        <small>(noop)</small>
+      </h3>
+      <div class="playground3">
+        <p data-name="foo"><code>[data-name="foo"]</code>, but out of context</p>
+      </div>
+    </div>
+
+    <script src="frumpy.js"></script>
+    <script src="example.js"></script>
+  </body>
+</html>
+

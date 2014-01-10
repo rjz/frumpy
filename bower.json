@@ -1,0 +1,17 @@
+{
+  "name": "frumpy",
+  "version": "0.0.0",
+  "authors": [
+    "rjz <rj@rjzaworski.com>"
+  ],
+  "description": "Event dispatcher",
+  "main": "src/frumpy.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

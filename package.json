@@ -1,0 +1,20 @@
+{
+  "name": "frumpy",
+  "version": "0.0.1",
+  "description": "State-managing event dispatcher",
+  "main": "src/frumpy.js",
+  "scripts": {
+    "start": "node -e 'require(\"./tasks\").server()'",
+    "docs": "node -e 'require(\"./tasks\").docs()'",
+    "test": "./node_modules/jshint/bin/jshint src/frumpy.js && ./node_modules/mocha/bin/mocha"
+  },
+  "author": "@rjzaworski",
+  "license": "WTFPL",
+  "devDependencies": {
+    "hogan.js": "~2.0.0",
+    "jshint": "~2.4.1",
+    "mocha": "~1.19.0"
+    "node-static": "~0.7.3",
+    "scrawl": "0.0.5"
+  }
+}
