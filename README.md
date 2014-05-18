@@ -33,6 +33,8 @@ Then create an instance of `Frumpy` and wire it up:
 
 ### Usage
 
+    $ npm install && bower install
+
 Launch a server at http://localhost:3277
 
     $ npm start

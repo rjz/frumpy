@@ -1,10 +1,10 @@
 {
   "name": "frumpy",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "authors": [
     "rjz <rj@rjzaworski.com>"
   ],
-  "description": "Event dispatcher",
+  "description": "A tiny event dispatcher",
   "main": "src/frumpy.js",
   "license": "MIT",
   "ignore": [
