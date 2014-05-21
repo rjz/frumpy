@@ -2,6 +2,8 @@
 
 A tiny (<1k) event dispatcher with very few features and opinions.
 
+[http://rjz.github.io/frumpy]
+
 ### Example
 
 Write some routines that interact with the application model.

@@ -139,7 +139,7 @@
      *
      * @id Frumpy::trigger
      * @param {String} name - the name of the event
-     * @param args... - any additional arguments to forward to the event
+     * @param {args...} - any additional arguments to forward to the event
      *   handling routines
      *
      * var f = new Frumpy({ foo: 'bar' }, [
@@ -253,7 +253,7 @@
      *
      * @id partial
      * @param {Function} f
-     * @param args... - arguments to apply
+     * @param {args...} - arguments to apply
      * @returns {Function}
      */
     partial: partial

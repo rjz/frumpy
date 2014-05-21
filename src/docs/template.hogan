@@ -19,6 +19,7 @@
             <a class="pull-right" href="#top">[top]</a>
             <h3><a name="{{id}}"></a>{{id}}</h3>
             <section>{{{description_html}}}</section>
+            {{#params}}
             <h5>Arguments</h5>
             <table>
               <tr>
@@ -34,6 +35,7 @@
               </tr>
             {{/params}}
             </table>
+            {{/params}}
             {{#example}}
               <h5>Example</h5>
               <pre><code>{{example}}</code></pre>
