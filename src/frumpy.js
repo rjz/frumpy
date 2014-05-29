@@ -8,8 +8,12 @@
 
   /**
    * `Frumpy` wraps event handling around the evolving state of an application.
-   * It makes no assumptions about the soure of its events or how the
-   * application itself will be used.
+   * It makes no assumptions about event provenance or how the application
+   * itself will be used--only that the application will need to update its
+   * state in response to certain stimuli.
+   *
+   * Frumpy applications consist of a list of a mapping from event names to
+   * handling procedures.
    *
    * **Handlers** are tuples pairing a `String` label with a collection of one or
    * more callback routines. When an event is attached to the dispatcher using
@@ -17,7 +21,9 @@
    * copy of the application's state and any additional arguments supplied by
    * the originating event. Handlers may either return `undefined` (no changes
    * to the model) or a new JavaScript object representing an updated
-   * application state.
+   * application state. They may be chained: if multiple handlers are attached
+   * to an event, each subsequent handler will receive the transformed state
+   * returned by the previous handler in the chain.
    *
    * **Initial state** is a
    * [POJO](http://en.wikipedia.org/wiki/Plain_Old_Java_Object) containing
@@ -25,10 +31,15 @@
    *
    *     // An event-handling routine
    *     function onClick (model, evt) {
-   *        evt.preventDefault();
-   *        return Frumpy.extend({}, model, {
-   *          clicks: model.clicks + 1
-   *        });
+   *       evt.preventDefault();
+   *       return Frumpy.extend({}, model, {
+   *         clicks: model.clicks + 1
+   *       });
+   *     }
+   *
+   *     // Another routine; no update to state
+   *     function refresh (model) {
+   *       document.querySelector('.counter').innerHTML = model.clicks;
    *     }
    *
    *     // An initial state
@@ -36,10 +47,10 @@
    *
    *     var f = new Frumpy(model0, [
    *       // An event handler
-   *       [ 'click', [ onClick ] ]
+   *       [ 'click', [ onClick, refresh ] ]
    *     ];
    *
-   * New instances of `Frumpy` can now be wired into JavaScript events using
+   * Finally, an event can be bound to the `Frumpy` application by using
    * [`Frumpy::as`](#Frumpy::as):
    *
    *     document.addEventListener('click', f.as('click'));
