@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node -e 'require(\"./tasks\").server()'",
     "docs": "node -e 'require(\"./tasks\").docs()'",
-    "test": "./node_modules/jshint/bin/jshint src/frumpy.js && ./node_modules/mocha/bin/mocha"
+    "test": "./node_modules/jshint/bin/jshint src/**/*.js && ./node_modules/mocha/bin/mocha"
   },
   "author": "@rjzaworski",
   "license": "WTFPL",
