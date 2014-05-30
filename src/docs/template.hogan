@@ -14,12 +14,19 @@
             {{/entries}}
           </ul>
 
+          <h5>Plugins</h5>
+          <ul>
+            {{#pluginMethods}}
+              <li><a href="#{{id}}">{{id}}</a></li>
+            {{/pluginMethods}}
+          </ul>
+
         {{#entries}}
           <section>
             <a class="pull-right" href="#top">[top]</a>
             <h3><a name="{{id}}"></a>{{id}}</h3>
             <section>{{{description_html}}}</section>
-            {{#params}}
+            {{#params.length}}
             <h5>Arguments</h5>
             <table>
               <tr>
@@ -35,7 +42,7 @@
               </tr>
             {{/params}}
             </table>
-            {{/params}}
+            {{/params.length}}
             {{#example}}
               <h5>Example</h5>
               <pre><code>{{example}}</code></pre>
@@ -43,6 +50,38 @@
 
           </section>
         {{/entries}}
+
+        {{#pluginMethods}}
+          <section>
+            <a class="pull-right" href="#top">[top]</a>
+            <h3><a name="{{id}}"></a>{{id}}</h3>
+            <section>{{{description_html}}}</section>
+
+            {{#params.length}}
+            <h5>Arguments</h5>
+            <table>
+              <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            {{#params}}
+              <tr>
+                <td><code>{{type}}</code></td>
+                <td>{{name}}</td>
+                <td>{{description}}</td>
+              </tr>
+            {{/params}}
+            </table>
+            {{/params.length}}
+            {{#example}}
+              <h5>Example</h5>
+              <pre><code>{{example}}</code></pre>
+            {{/example}}
+
+          </section>
+        {{/pluginMethods}}
+
       </section>
     </div>
     <footer class="dark">

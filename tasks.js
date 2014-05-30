@@ -49,19 +49,31 @@ module.exports.docs = function () {
 
   var scrawl = require('scrawl');
 
-  var src = fs.readFileSync('./src/frumpy.js').toString(),
-      entries = scrawl.parse(src);
-
-  var tmpl = require('hogan.js')
-        .compile(fs.readFileSync('./src/docs/template.hogan', 'utf8'))
-        .render({ entries: entries });
-
-  if (!fs.existsSync('./docs')) {
-    fs.mkdirSync('./docs');
+  function parseFile (path) {
+    var src = fs.readFileSync(path, 'utf8');
+    return scrawl.parse(src);
   }
 
-  fs.createReadStream('./src/docs/style.css').pipe(fs.createWriteStream('./docs/style.css'));
+  var flatten = function (a, b) {
+    return a.concat(parseFile(b));
+  };
 
-  fs.writeFileSync('./docs/index.html', tmpl);
+  require('glob')('src/plugins/*.js', function (err, plugins) {
+
+    var entries = parseFile('./src/frumpy.js');
+    var pluginMethods = plugins.reduce(flatten, []);
+
+    var tmpl = require('hogan.js')
+          .compile(fs.readFileSync('./src/docs/template.hogan', 'utf8'))
+          .render({ entries: entries, pluginMethods: pluginMethods });
+
+    if (!fs.existsSync('./docs')) {
+      fs.mkdirSync('./docs');
+    }
+
+    fs.createReadStream('./src/docs/style.css').pipe(fs.createWriteStream('./docs/style.css'));
+
+    fs.writeFileSync('./docs/index.html', tmpl);
+  });
 };
 
