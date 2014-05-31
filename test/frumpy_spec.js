@@ -17,5 +17,13 @@ describe('Frumpy', function () {
       });
     });
   });
+
+  describe('utilities', function () {
+    ['first','last','rest','extend','partial'].forEach(function (fn) {
+      it('includes ' + fn, function () {
+        assert.ok(Frumpy[fn]);
+      });
+    });
+  });
 });
 

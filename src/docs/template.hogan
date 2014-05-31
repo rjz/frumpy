@@ -9,25 +9,30 @@
       <section class="container">
         <h1><a name="top"></a>Frumpy</h1>
           <ul>
-            {{#entries}}
+            {{#core}}
               <li><a href="#{{id}}">{{id}}</a></li>
-            {{/entries}}
+            {{/core}}
           </ul>
 
           <h5>Plugins</h5>
           <ul>
-            {{#pluginMethods}}
-              <li><a href="#{{id}}">{{id}}</a></li>
-            {{/pluginMethods}}
+            {{#plugins}}
+              <li><a href="#plugin-{{id}}">{{id}}</a></li>
+            {{/plugins}}
           </ul>
 
-        {{#entries}}
+        {{#core}}
           {{>method}}
-        {{/entries}}
+        {{/core}}
 
-        {{#pluginMethods}}
-          {{>method}}
-        {{/pluginMethods}}
+        <hr />
+
+        {{#plugins}}
+        <h2><a name="plugin-{{id}}"></a>{{id}}</h2>
+          {{#methods}}
+            {{>method}}
+          {{/methods}}
+        {{/plugins}}
 
       </section>
     </div>

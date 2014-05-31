@@ -194,6 +194,14 @@
     }
   }
 
+  function first (arr) {
+    return slice.call(arr, 0, 1).pop();
+  }
+
+  function last (arr) {
+    return slice.call(arr, -1).pop();
+  }
+
   function rest (arr) {
     return slice.call(arr, 1);
   }
@@ -202,6 +210,16 @@
     var args = rest(arguments);
     return function () {
       return fnc.apply(this, args.concat(slice.call(arguments)));
+    };
+  }
+
+  function compose () {
+    var fns = slice.call(arguments).reverse();
+    return function () {
+      var args = slice.call(arguments);
+      rest(fns).reduce(function (m, f) {
+        return f(m);
+      }, first(fns).apply(this, args));
     };
   }
 
@@ -239,6 +257,24 @@
      * @id slice
      */
     slice: slice,
+
+    /**
+     * Retrieve the first item in an `Array`
+     *
+     * @id first
+     * @param {Array} arr
+     * @returns {Object}
+     */
+    first: first,
+
+    /**
+     * Retrieve the last item in an `Array`
+     *
+     * @id last
+     * @param {Array} arr
+     * @returns {Object}
+     */
+    last: last,
 
     /**
      * Retrieve all but the first item in an `Array`
