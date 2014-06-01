@@ -24,6 +24,77 @@ describe('Frumpy', function () {
         assert.ok(Frumpy[fn]);
       });
     });
+
+    describe('.slice', function () {
+      it('takes starting offset', function () {
+        var arr = [1, 2, 3];
+        assert.deepEqual(Frumpy.slice(arr, 1), [2,3]);
+      });
+
+      it('takes ending offset', function () {
+        var arr = [1, 2, 3];
+        assert.deepEqual(Frumpy.slice(arr, 1, 2), [2]);
+      });
+    });
+
+    describe('.first', function () {
+      it('returns first element', function () {
+        var arr = [1, 2, 3];
+        assert.equal(Frumpy.first(arr), 1);
+      });
+    });
+
+    describe('.last', function () {
+      it('returns last element', function () {
+        var arr = [1, 2, 3];
+        assert.equal(Frumpy.last(arr), 3);
+      });
+    });
+
+    describe('.rest', function () {
+      it('returns last element', function () {
+        var arr = [1, 2, 3];
+        assert.equal(Frumpy.last(arr), 3);
+      });
+    });
+
+    describe('.extend', function () {
+      it('returns an object', function () {
+        var o = { a: 1 };
+        assert.equal(Frumpy.extend(o, { b: 2 }) instanceof Object, true);
+      });
+
+      it('extends first object', function () {
+        var o = { a: 1 };
+        assert.equal(Frumpy.extend(o, { b: 2 }), o);
+      });
+
+      it('mixes in keys from additional objects', function () {
+        var o = { a: 1 };
+        Frumpy.extend(o,
+          { b: 2 },
+          { c: 3 }
+        );
+        assert.equal(o.a, 1);
+        assert.equal(o.b, 2);
+        assert.equal(o.c, 3);
+      });
+    });
+
+    describe('.partial', function () {
+      var add = function (a, b) {
+        return a + b;
+      };
+
+      it('returns a function', function () {
+        assert.equal(Frumpy.partial(add, 4) instanceof Function, true);
+      });
+
+      it('binds arguments', function () {
+        var add4 = Frumpy.partial(add, 4);
+        assert.equal(add4(1), 5);
+      });
+    });
   });
 });
 

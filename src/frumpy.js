@@ -2,8 +2,6 @@
 
   'use strict';
 
-  var slice = Array.prototype.slice;
-
   var keys = Object.keys;
 
   /**
@@ -57,16 +55,16 @@
    *
    * @id Frumpy
    * @type Class
-   * @param {Object} model - the initial state of the dispatcher's model
+   * @param {Object} model - the initial state of the application model
    * @param {Array} handlers - a list of handlers for named events
    *
-   * var f = new Frumpy({ foo: 'bar' }, [
-   *   [ 'fizz', [onFizz, log] ],
-   *   [ 'buzz', [onBuzz, log] ]
+   * var app = new Frumpy({ foo: 'bar' }, [
+   *   [ 'fizz', [onFizz, logFizz] ],
+   *   [ 'buzz', [onBuzz, logBuzz] ]
    * ]);
    *
-   * window.setInterval(f.as('fizz'), 300);
-   * window.setInterval(f.as('buzz'), 500);
+   * window.setInterval(app.as('fizz'), 300);
+   * window.setInterval(app.as('buzz'), 500);
    */
   function Frumpy (model0, uHandlers) {
 
@@ -93,6 +91,7 @@
      *
      * @id Frumpy::as
      * @param {String} name - the name of the event
+     * @returns {Function}
      *
      * var f = new Frumpy({ foo: 'bar' }, [
      *   [ 'model:change', [save] ],
@@ -135,12 +134,13 @@
      */
     this.as = function (name) {
 
-      var matchingHandlers = handlers.filter(partial(isHandlerFor, name));
+      var isHandlerForName = partial(isHandlerFor, name);
 
       return function () {
-        var args = slice.call(arguments, 0);
-        var newModel = matchingHandlers
-          .reduce(partial(invokeHandler, args), model);
+        var newModel = handlers
+          .filter(isHandlerForName)
+          .reduce(partial(invokeHandler, slice(arguments)), model);
+
         updateModel(newModel);
       };
     };
@@ -179,7 +179,7 @@
     return this;
   }
 
-  // TODO: this is a really lousy implementation of `isEqual`
+  // TODO: this is a *really* lousy implementation of `isEqual`
   function isEqual (o1, o2) {
     var o1Keys, o2Keys;
     if (o1 instanceof Object && o2 instanceof Object) {
@@ -194,32 +194,27 @@
     }
   }
 
+  function slice (arr) {
+    var _slice = Array.prototype.slice;
+    return _slice.apply(arr, _slice.call(arguments, 1));
+  }
+
   function first (arr) {
-    return slice.call(arr, 0, 1).pop();
+    return slice(arr, 0, 1).pop();
   }
 
   function last (arr) {
-    return slice.call(arr, -1).pop();
+    return slice(arr, -1).pop();
   }
 
   function rest (arr) {
-    return slice.call(arr, 1);
+    return slice(arr, 1);
   }
 
   function partial (fnc) {
     var args = rest(arguments);
     return function () {
-      return fnc.apply(this, args.concat(slice.call(arguments)));
-    };
-  }
-
-  function compose () {
-    var fns = slice.call(arguments).reverse();
-    return function () {
-      var args = slice.call(arguments);
-      rest(fns).reduce(function (m, f) {
-        return f(m);
-      }, first(fns).apply(this, args));
+      return fnc.apply(this, args.concat(slice(arguments)));
     };
   }
 
@@ -255,6 +250,10 @@
      * Alias for `Array.prototype.slice`
      *
      * @id slice
+     * @param {Array} arr
+     * @param {Number} start - starting index
+     * @param {Number} end - final index
+     * @returns {Array}
      */
     slice: slice,
 
@@ -263,7 +262,7 @@
      *
      * @id first
      * @param {Array} arr
-     * @returns {Object}
+     * @returns {Mixed}
      */
     first: first,
 
@@ -272,7 +271,7 @@
      *
      * @id last
      * @param {Array} arr
-     * @returns {Object}
+     * @returns {Mixed}
      */
     last: last,
 
