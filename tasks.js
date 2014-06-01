@@ -71,6 +71,9 @@ module.exports.docs = function () {
 
     return parsed.map(function (p) {
       if (p.signal) {
+        if (!p.signal.map) {
+          p.signal = [p.signal];
+        }
         p.signal = p.signal.map(function (s) {
           var parts = s.split(' ');
           return {
