@@ -66,8 +66,22 @@ module.exports.docs = function () {
       hogan = require('hogan.js');
 
   function readAndParse (path) {
-    var src = fs.readFileSync(path, 'utf8');
-    return scrawl.parse(src);
+    var src = fs.readFileSync(path, 'utf8'),
+        parsed = scrawl.parse(src);
+
+    return parsed.map(function (p) {
+      if (p.signal) {
+        p.signal = p.signal.map(function (s) {
+          var parts = s.split(' ');
+          return {
+            name: Frumpy.first(parts),
+            desc: Frumpy.rest(parts).join(' ')
+          };
+        });
+      }
+
+      return p;
+    });
   }
 
   function reduceSrcFiles (a, b) {

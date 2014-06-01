@@ -24,13 +24,11 @@
         {{#core}}
           {{>method}}
         {{/core}}
-
         <hr />
-
         {{#plugins}}
         <h2><a name="plugin-{{id}}"></a>{{id}}</h2>
           {{#methods}}
-            {{>method}}
+           {{>method}}
           {{/methods}}
         {{/plugins}}
 

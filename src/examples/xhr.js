@@ -11,34 +11,28 @@
     [ 'xhr:error', [onXhrError] ]
   ]);
 
-  app.include = function (name) {
-    this[name] = Frumpy[name];
-  };
-
-  app.include(Frumpy.xhr);
+  function log () {
+    console.log.apply(console, ['[XHR Example]'].concat(Frumpy.slice(arguments)));
+  }
 
   function onXhrLoad (model, req) {
-    if (req.status >= 200 && req.status < 400){
-      model.lastRequest = req.status;
-/*      try {
-        return JSON.parse(req.responseText)
-      }
-      catch (e) {
-        console.error(e);
-      }
-      */
-    } else {
-      console.error('err', req.status);
+    if (req.status >= 200 && req.status < 400) {
+      log('success!', req.status);
     }
-
+    else {
+      log('error!', req.status);
+    }
     return Frumpy.extend({}, model, { lastRequest: req.status });
   }
 
   function onXhrError (model, xhr) {
-
+    log('failed establishing connection');
   }
 
-  app.xhr('get', '/foobar').send();
+  var xhr = Frumpy.xhr(app);
+
+  xhr.open('get', '/foobar');
+  xhr.send();
 
 })();
 

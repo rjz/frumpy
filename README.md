@@ -41,6 +41,10 @@ Launch a server at http://localhost:3277
 
     $ npm start
 
+### Tests
+
+    $ npm test
+
 ### License
 
 WTFPL

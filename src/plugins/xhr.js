@@ -1,22 +1,34 @@
 (function () {
 
   /**
-   *  Signals:
+   * Bind events from an XHR object to a Frumpy application
    *
-   *    - `xhr:load` - an XHR request is completed, regardless of status
-   *    - `xhr:error` - an XHR request failed to connect to the remote host
+   * @id Frumpy.xhr
+   * @type Function
+   * @param {Object} app - the Frumpy application to subscribe to XHR events
+   * @return {Object} - a bound `XMLHttpRequest` object
+   * @signal xhr:load an XHR request is completed, regardless of status
+   * @signal xhr:error an XHR request failed to connect to the remote host
    *
-   * @id  Frumpy.xhr
-   * @type  Function
-   * @param {String} method - an HTTP method
-   * @param {String} url - to where should we address the request?
+   * var app = new Frumpy(state0, [
+   *   [ 'xhr:load',  [onXhrLoad] ],
+   *   [ 'xhr:error', [onXhrError] ]
+   * ]);
    *
-   * app.include(Frumpy.xhr);
-   * app.xhr('post', '/items').send({ 'foobar' });
+   * function onXhrLoad (model, req) {
+   *   console.log(req.status);
+   * }
+   *
+   * function onXhrError (model, xhr) {
+   *   console.log('failed establishing connection');
+   * }
+   *
+   * var xhr = Frumpy.xhr(app);
+   * xhr.open('post', '/items');
+   * xhr.send({ foo: 'bar' });
+   *
    */
-  Frumpy.xhr = function (method, url) {
-
-    var app = this;
+  Frumpy.xhr = function (app) {
 
     // Clean up handlers
     var unbind = function (req) {
@@ -37,8 +49,6 @@
     };
 
     var request = new XMLHttpRequest();
-
-    request.open(method, url, true);
 
     request.addEventListener('load',  _onLoad);
     request.addEventListener('error', _onError);
