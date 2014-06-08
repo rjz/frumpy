@@ -136,6 +136,10 @@
 
       var isHandlerForName = partial(isHandlerFor, name);
 
+      // TODO: passing in a static model makes it impossible to interrupt the
+      //    chain of routines === unpredictable behavior when an interrupt is
+      //    triggered. We either need to queue interrupts or recover the model
+      //    at each step through the chain.
       return function () {
         var newModel = handlers
           .filter(isHandlerForName)
