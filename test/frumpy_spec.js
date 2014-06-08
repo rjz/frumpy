@@ -81,6 +81,29 @@ describe('Frumpy', function () {
       });
     });
 
+    describe('.copy', function () {
+      it('returns an object', function () {
+        var o = { a: 1 };
+        assert.equal(Frumpy.copy(o, { b: 2 }) instanceof Object, true);
+      });
+
+      it('does not extend the first object', function () {
+        var o = { a: 1 };
+        assert.notEqual(Frumpy.copy(o, { b: 2 }), o);
+      });
+
+      it('mixes in keys from additional objects', function () {
+        var o = { a: 1 };
+        var p = Frumpy.copy(o,
+          { b: 2 },
+          { c: 3 }
+        );
+        assert.equal(p.a, 1);
+        assert.equal(p.b, 2);
+        assert.equal(p.c, 3);
+      });
+    });
+
     describe('.partial', function () {
       var add = function (a, b) {
         return a + b;

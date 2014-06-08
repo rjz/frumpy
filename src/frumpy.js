@@ -182,6 +182,9 @@
   // TODO: this is a *really* lousy implementation of `isEqual`
   function isEqual (o1, o2) {
     var o1Keys, o2Keys;
+    if (o1 === o2) {
+      return true;
+    }
     if (o1 instanceof Object && o2 instanceof Object) {
       o1Keys = keys(o1);
       o2Keys = keys(o2);
@@ -190,7 +193,7 @@
       });
     }
     else {
-      return o1 === o2;
+      return false;
     }
   }
 
@@ -227,6 +230,10 @@
       }
     });
     return obj;
+  }
+
+  function copy () {
+    return extend.apply({}, [{}].concat(slice(arguments)));
   }
 
   function isHandlerFor (name, hnd) {
@@ -293,6 +300,17 @@
      * @returns {Object}
      */
     extend: extend,
+
+    /**
+     * Copy an object.
+     *
+     * @id copy
+     * @param {Object} obj - the base object to copy
+     * @param {Object, ...} objs... - additional objects whose attributes
+     *   should extend the copied `obj`
+     * @returns {Object}
+     */
+    copy: copy,
 
     /**
      * Partially apply a function
