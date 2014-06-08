@@ -38,10 +38,23 @@ html, body {
   height: 32px;
 }
 
+.scene .controls {
+  background-color: #231f20;
+  border:1px solid #fff;
+  color: #fff;
+  text-transform: uppercase;
+  position: absolute;
+  z-index: 1;
+}
+
     </style>
   </head>
   <body>
-    <div class="scene"></div>
+    <div class="scene js-scene">
+      <div class="controls">
+        <p class="js-score"></p>
+      </div>
+    </div>
   </body>
 </html>
 

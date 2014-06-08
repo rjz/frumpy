@@ -23,7 +23,9 @@
   }
 
   var initialState = {
-    newGoons: [],
+    score: 0,
+    created: [],
+    destroyed: [],
     actors: [
       new Actor({
         type: 'avatar',
@@ -39,7 +41,8 @@
     ['tick',       [calc, collide, cull, redraw]],
     ['spawnTick',  [spawn, spawn, spawn]],
     ['onKeyup',    [togglePaused]],
-    ['onClick',    [adjustAvatar]]
+    ['onClick',    [adjustAvatar]],
+    ['itsAllOver', [gameOver]]
   ]);
 
   win.setInterval(app.as('tick'), 20);
@@ -51,52 +54,95 @@
 
   document.addEventListener('DOMContentLoaded', app.as('ready'));
 
+  function gameOver (model) {
+    console.log('it\'s all over');
+  }
+
   function ready (model) {
     return Frumpy.copy(model, {
+      t0: (new Date()),
       isPaused: false,
-      $scene: document.querySelector('.scene')
+      $scene: document.querySelector('.js-scene'),
+      $score: document.querySelector('.js-scene .js-score')
     });
   }
 
-  function adjustAvatar (model, evt) {
-    var avatars, others;
-
-    var actorTypes = model.actors.reduce(function (types, a) {
-      if (a.type === 'avatar') {
-        return [types[0].concat(a), types[1]];
+  // Split an array based on a truth test. Values matching go left; values
+  // failing go right.
+  function splitArr (arr, test) {
+    return arr.reduce(function (results, a) {
+      if (test(a)) {
+        return [results[0].concat(a), results[1]];
       }
       else {
-        return [types[0], types[1].concat(a)];
+        return [results[0], results[1].concat(a)];
       }
     }, [[],[]]);
+  }
 
-    avatars = actorTypes[0];
-    others = actorTypes[1];
+  function isAvatar (a) {
+    return a.type === 'avatar';
+  }
+
+  function copyAvatarVelocity (model, iter) {
+
+    var actorTypes = splitArr(model.actors, isAvatar);
+    var avatars = actorTypes[0];
+    var others = actorTypes[1];
 
     if (!avatars.length) return model;
 
     return Frumpy.copy(model, {
       actors: others.concat(avatars.map(function (a) {
-        var dy = evt.clientY - a.pos[1],
-            dx = evt.clientX - a.pos[0];
-
-        var c = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-
-        var vx = dx / c * 2,
-            vy = dy / c * 2
-
         return new Actor(Frumpy.copy(a, {
-          v: [vx, vy]
+          v: iter(a)
         }));
       }))
     });
   }
 
+  function adjustAvatar (model, evt) {
+    return copyAvatarVelocity(model, function (a) {
+      var dy = evt.clientY - a.pos[1],
+          dx = evt.clientX - a.pos[0];
+
+      var c = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+
+      var vx = dx / c * 2,
+          vy = dy / c * 2
+
+      return [vx, vy];
+    });
+  }
+
   function togglePaused (model, evt) {
-    switch (evt.keyCode) {
-      case 32:
-        return Frumpy.copy(model, { isPaused: !model.isPaused });
-        break;
+    var attrs;
+
+    var identity = function (v) {
+      return v;
+    };
+
+    if (!model.isGameOver) {
+      switch (evt.keyCode) {
+        case 32:
+          return attrs = { isPaused: !model.isPaused };
+          break;
+        case 37: // left
+          return copyAvatarVelocity(model, Frumpy.partial(identity, [-2, 0]));
+          break;
+        case 39: // right
+          return copyAvatarVelocity(model, Frumpy.partial(identity, [2, 0]));
+          break;
+        case 38: // up
+          return copyAvatarVelocity(model, Frumpy.partial(identity, [0, -2]));
+          break;
+        case 40: // down
+          return copyAvatarVelocity(model, Frumpy.partial(identity, [0, 2]));
+          break;
+      }
+      if (attrs) {
+        return Frumpy.copy(model, attrs);
+      }
     }
   }
 
@@ -128,96 +174,105 @@
       v: v
     });
 
-    return Frumpy.copy(model, { newGoons: [newGoon] });
+    return Frumpy.copy(model, {
+      created: [newGoon]
+    });
   }
 
   function calc (model) {
+
+    var updatedActors;
+
     var tickPosition = function (actor) {
       var x = actor.pos[0] + actor.v[0],
           y = actor.pos[1] + actor.v[1];
 
-      return {
+      return new Actor(Frumpy.copy(actor, {
         pos: [x, y]
-      }
+      }));
     };
 
-    var copiedGoons = model.newGoons.concat(model.actors).map(function (g) {
-      return new Actor(Frumpy.copy(g, tickPosition(g)));
-    });
+    if (!model.isPaused) {
 
-    if (model.isPaused) return;
+      updatedActors = model.created.concat(model.actors).map(tickPosition);
 
-    return Frumpy.copy(model, {
-      actors: copiedGoons,
-      newGoons: []
-    });
+      return Frumpy.copy(model, {
+        score: (new Date()) - model.t0,
+        actors: updatedActors,
+        created: []
+      });
+    }
   }
 
   function cull (model) {
+
+    var destroyed, survivors,
+        isGameOver = false,
+        isPaused = false;
+
     var w = win.innerWidth,
         h = win.innerHeight;
 
-    var newGoons = model.actors.filter(function (g) {
-
+    var isInBounds = function (g) {
       var gx = g.pos[0],
           gy = g.pos[1];
 
-      if (g._deleted) { // collision?
-        if (g.type === 'avatar') {
-          //model.isPaused = true;
-          console.log('destroyed');
-        }
-        if (model.$scene && g._el.parentNode === model.$scene) {
-          model.$scene.removeChild(g._el);
-        }
-      }
-      else if (gx > 0 && gx < w && gy > 0 && gy < h) {
-        return true;
-      }
-      else if (g._el.parentNode === model.$scene) {
-        model.$scene.removeChild(g._el);
-      }
-    });
+      return (gx > 0 && gx < w && gy > 0 && gy < h);
+    };
 
-    if (model.isPaused) return;
+    if (!model.isPaused) {
 
-    return Frumpy.copy(model, { actors: newGoons });
+      survivors = splitArr(model.actors, isInBounds);
+
+      destroyed = model.destroyed.concat(survivors[1]);
+
+      if (destroyed.some(function (g) {
+        return g.type === 'avatar';
+      })) {
+        isPaused = true;
+        isGameOver = true;
+        app.trigger('itsAllOver');
+      }
+
+      return Frumpy.copy(model, {
+        actors: survivors[0],
+        destroyed: destroyed,
+        isGameOver: isGameOver,
+        isPaused: isPaused
+      });
+    }
   }
 
   function collide (model) {
 
+    var survivors;
+
     // check by circles. naive.
-    var checkCollision = function (g1, g2) {
-      if (Math.abs(g1.pos[0] - g2.pos[0]) < 30 && Math.abs(g1.pos[1] - g2.pos[1]) < 30) {
-        return true;
-      }
+    var haveCollided = function (g1, g2) {
+      return (Math.abs(g1.pos[0] - g2.pos[0]) < 30 &&
+              Math.abs(g1.pos[1] - g2.pos[1]) < 30);
     };
 
-    var newGoons = model.actors.reduce(function (m, g) {
-      var collisions = model.actors.filter(function (h) {
-        return g !== h && checkCollision(g, h);
+    var hasSurvived = function (a) {
+      return !model.actors.some(function (h) {
+        return a !== h && haveCollided(a, h);
       });
+    };
 
-      if (collisions.length) {
-        return m.concat(new Actor(Frumpy.extend({
-          _deleted: true
-        }, g)));
-      }
-      else {
-        return m.concat(g);
-      }
-    }, []);
+    if (!model.isPaused) {
 
-    if (model.isPaused) return;
+      survivors = splitArr(model.actors, hasSurvived);
 
-    return Frumpy.copy(model, { actors: newGoons });
+      return Frumpy.copy(model, {
+        actors    : survivors[0],
+        destroyed : model.destroyed.concat(survivors[1])
+      });
+    }
   }
 
   function redraw (model) {
 
-    if (model.isPaused) return;
-
-    model.actors.filter(function (g, i) {
+    var drawActor = function (g, i) {
 
       if (g._el.parentNode !== model.$scene) {
         model.$scene.appendChild(g._el);
@@ -225,10 +280,26 @@
 
       Frumpy.extend(g._el.style, {
         left: (g.pos[0] - g.width / 2) + 'px',
-        top: (g.pos[1] - g.height / 2) + 'px'
+        top:  (g.pos[1] - g.height / 2) + 'px'
       });
-    });
-  }
+    };
 
+    var removeActor = function (g) {
+      if (g._el.parentNode === model.$scene) {
+        model.$scene.removeChild(g._el);
+      }
+    };
+
+    if (!model.isPaused) {
+      model.destroyed.forEach(removeActor);
+      model.actors.forEach(drawActor);
+
+      model.$score.innerText = model.score;
+
+      return Frumpy.copy(model, {
+        destroyed: []
+      });
+    }
+  }
 })(window);
 
