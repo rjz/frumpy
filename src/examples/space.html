@@ -10,6 +10,11 @@ html, body {
   overflow: hidden;
 }
 
+@-webkit-keyframes cycle {
+  0%   { -webkit-transform: rotate(0); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
 .scene {
   border:1px solid #fff;
   overflow: hidden;
@@ -21,12 +26,17 @@ html, body {
 }
 
 .goon {
+  -webkit-animation: cycle 5s infinite linear;
   border-radius: 8px;
   border:1px solid #fff;
   color: #fff;
   position: absolute;
   width: 32px;
   height: 32px;
+}
+
+.paused .goon {
+  -webkit-animation: none;
 }
 
 .avatar {

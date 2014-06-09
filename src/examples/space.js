@@ -5,6 +5,7 @@
   function Actor (opts) {
 
     var el;
+
     if (opts._el) {
       el = opts._el;
     }
@@ -14,8 +15,8 @@
     }
 
     Frumpy.extend(this, opts, {
-      width: 32,
-      height: 32,
+      width:  opts._radius * 2,
+      height: opts._radius * 2,
       _el: el
     });
 
@@ -28,6 +29,7 @@
     destroyed: [],
     actors: [
       new Actor({
+        _radius: 16,
         type: 'avatar',
         pos: [window.innerWidth / 2, window.innerHeight / 2],
         v: [0, 0]
@@ -171,7 +173,8 @@
       type: 'goon',
       id: Math.random(),
       pos: pos,
-      v: v
+      v: v,
+      _radius: 16 + Math.floor(Math.random() * 40)
     });
 
     return Frumpy.copy(model, {
@@ -249,8 +252,11 @@
 
     // check by circles. naive.
     var haveCollided = function (g1, g2) {
-      return (Math.abs(g1.pos[0] - g2.pos[0]) < 30 &&
-              Math.abs(g1.pos[1] - g2.pos[1]) < 30);
+
+      var radius = g1._radius + g2._radius;
+
+      return (Math.abs(g1.pos[0] - g2.pos[0]) < radius &&
+              Math.abs(g1.pos[1] - g2.pos[1]) < radius);
     };
 
     var hasSurvived = function (a) {
@@ -273,12 +279,13 @@
   function redraw (model) {
 
     var drawActor = function (g, i) {
-
       if (g._el.parentNode !== model.$scene) {
         model.$scene.appendChild(g._el);
       }
 
       Frumpy.extend(g._el.style, {
+        width: g.width + 'px',
+        height: g.height + 'px',
         left: (g.pos[0] - g.width / 2) + 'px',
         top:  (g.pos[1] - g.height / 2) + 'px'
       });
@@ -291,13 +298,15 @@
     };
 
     if (!model.isPaused) {
-      model.destroyed.forEach(removeActor);
-      model.actors.forEach(drawActor);
+      win.requestAnimationFrame(function () {
+        model.destroyed.forEach(removeActor);
+        model.actors.forEach(drawActor);
 
-      model.$score.innerText = model.score;
+        model.$score.innerText = model.score;
 
-      return Frumpy.copy(model, {
-        destroyed: []
+        return Frumpy.copy(model, {
+          destroyed: []
+        });
       });
     }
   }
