@@ -8,18 +8,27 @@
     <div class="content">
       <section class="container">
         <h1><a name="top"></a>Frumpy</h1>
-          <ul>
-            {{#core}}
-              <li><a href="#{{id}}">{{id}}</a></li>
-            {{/core}}
-          </ul>
 
-          <h5>Plugins</h5>
-          <ul>
-            {{#plugins}}
-              <li><a href="#plugin-{{id}}">{{id}}</a></li>
-            {{/plugins}}
-          </ul>
+        <h5>Demos</h5>
+        <ul>
+          <li>
+            <a href="examples/space.html">space</a> (<a href="https://github.com/rjz/frumpy/tree/master/src/examples/space.js">source code</a>)
+          </li>
+        </ul>
+
+        <h5>Core</h5>
+        <ul>
+          {{#core}}
+            <li><a href="#{{id}}">{{id}}</a></li>
+          {{/core}}
+        </ul>
+
+        <h5>Plugins</h5>
+        <ul>
+          {{#plugins}}
+            <li><a href="#plugin-{{id}}">{{id}}</a></li>
+          {{/plugins}}
+        </ul>
 
         {{#core}}
           {{>method}}

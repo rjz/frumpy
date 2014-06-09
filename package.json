@@ -5,7 +5,7 @@
   "main": "src/frumpy.js",
   "scripts": {
     "start": "node -e 'require(\"./tasks\").server()'",
-    "docs": "node -e 'require(\"./tasks\").docs()'",
+    "docs": "node -e 'require(\"./tasks\").docs()' && cp -r src/* docs",
     "test": "./node_modules/jshint/bin/jshint src/**/*.js && ./node_modules/mocha/bin/mocha"
   },
   "author": "@rjzaworski",
