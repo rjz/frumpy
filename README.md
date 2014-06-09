@@ -2,7 +2,7 @@
 
 A tiny (<1k) event dispatcher with very few features and opinions.
 
-[http://rjz.github.io/frumpy]
+[http://rjz.github.io/frumpy](http://rjz.github.io/frumpy)
 
 ### Example
 
@@ -15,7 +15,7 @@ Write some routines that interact with the application model.
 
     function ticking (model) {
       // Update the model
-      return Frumpy.extend({}, model, {
+      return Frumpy.copy(model, {
         foo: model.foo + 5
       });
     }
@@ -47,5 +47,5 @@ Launch a server at http://localhost:3277
 
 ### License
 
-WTFPL
+[WTFPL](http://www.wtfpl.net/)
 
