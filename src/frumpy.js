@@ -150,7 +150,7 @@
     };
 
     /**
-     * Trigger an event on the dispatcher
+     * Schedule an event on the dispatcher to be triggered at next tick
      *
      * @id Frumpy::trigger
      * @param {String} name - the name of the event
@@ -169,7 +169,9 @@
      *
      */
     this.trigger = function (name) {
-      return this.as(name).apply(this, rest(arguments));
+      window.setTimeout(function () {
+        return this.as(name).apply(this, rest(arguments));
+      }.bind(this), 0);
     };
 
     // Ensure handler arguments are collections
