@@ -111,7 +111,7 @@
       var c = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 
       var vx = dx / c * 2,
-          vy = dy / c * 2
+          vy = dy / c * 2;
 
       return [vx, vy];
     });
@@ -127,20 +127,15 @@
     if (!model.isGameOver) {
       switch (evt.keyCode) {
         case 32:
-          return attrs = { isPaused: !model.isPaused };
-          break;
+          return { isPaused: !model.isPaused };
         case 37: // left
           return copyAvatarVelocity(model, Frumpy.partial(identity, [-2, 0]));
-          break;
         case 39: // right
           return copyAvatarVelocity(model, Frumpy.partial(identity, [2, 0]));
-          break;
         case 38: // up
           return copyAvatarVelocity(model, Frumpy.partial(identity, [0, -2]));
-          break;
         case 40: // down
           return copyAvatarVelocity(model, Frumpy.partial(identity, [0, 2]));
-          break;
       }
       if (attrs) {
         return Frumpy.copy(model, attrs);
@@ -167,7 +162,7 @@
       case 1: pos = [mx, ry]; v = [-0.8, 0]; break;
       case 2: pos = [rx, 0 ]; v = [0,  0.8]; break;
       case 3: pos = [rx, my]; v = [0, -0.8]; break;
-    };
+    }
 
     var newGoon = new Actor({
       type: 'goon',

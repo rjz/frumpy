@@ -1,6 +1,6 @@
 (function (win) {
 
-  if (!win) throw new ReferenceError('History must be run in the browser);
+  if (!win) throw new ReferenceError('History must be run in the browser');
 
   /**
    * History
