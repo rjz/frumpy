@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node -e 'require(\"./tasks\").server()'",
     "docs": "node -e 'require(\"./tasks\").docs([\"src/frumpy.js\",\"src/plugins/*.js\"])' && cp -r src/* docs",
-    "test": "./node_modules/jshint/bin/jshint src/**/*.js && ./node_modules/mocha/bin/mocha"
+    "test": "./node_modules/jshint/bin/jshint src/**/*.js && ./node_modules/mocha/bin/mocha",
+    "uglify": "./node_modules/uglify-js/bin/uglifyjs src/frumpy.js > frumpy.min.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
     "jshint": "~2.4.1",
     "mocha": "~1.19.0",
     "node-static": "~0.7.3",
-    "scrawl": "~0.0.5"
+    "scrawl": "~0.0.5",
+    "uglify-js": "^2.4.15"
   }
 }
