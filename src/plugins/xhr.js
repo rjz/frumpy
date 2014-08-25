@@ -4,6 +4,7 @@
    * Bind events from an XHR object to a Frumpy application
    *
    * @id Frumpy.xhr
+   * @group plugins
    * @type Function
    * @param {Object} app - the Frumpy application to subscribe to XHR events
    * @return {Object} - a bound `XMLHttpRequest` object

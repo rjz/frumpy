@@ -4,6 +4,7 @@
    * Touch
    *
    * @id Frumpy.touch
+   * @group plugins
    * @param {Object} app - a Frumpy application
    * @signal touch:start a touch event has begun
    * @signal touch:end a touch event has ended

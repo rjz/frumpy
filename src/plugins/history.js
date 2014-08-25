@@ -5,6 +5,7 @@
   /**
    * History
    * @id Frumpy.history
+   * @group plugins
    * @param {Object} app - a Frumpy application
    * @signal history:popstate history has changed
    * @return null

@@ -263,6 +263,7 @@
      * Alias for `Array.prototype.slice`
      *
      * @id slice
+     * @group util
      * @param {Array} arr
      * @param {Number} start - starting index
      * @param {Number} end - final index
@@ -274,6 +275,7 @@
      * Retrieve the first item in an `Array`
      *
      * @id first
+     * @group util
      * @param {Array} arr
      * @returns {Mixed}
      */
@@ -283,6 +285,7 @@
      * Retrieve the last item in an `Array`
      *
      * @id last
+     * @group util
      * @param {Array} arr
      * @returns {Mixed}
      */
@@ -292,6 +295,7 @@
      * Retrieve all but the first item in an `Array`
      *
      * @id rest
+     * @group util
      * @param {Array} arr
      * @returns {Array}
      */
@@ -301,6 +305,7 @@
      * Extend an object.
      *
      * @id extend
+     * @group util
      * @param {Object} obj - the base object to extend
      * @param {Object, ...} objs... - additional objects to tack on the end
      * @returns {Object}
@@ -311,6 +316,7 @@
      * Copy an object.
      *
      * @id copy
+     * @group util
      * @param {Object} obj - the base object to copy
      * @param {Object, ...} objs... - additional objects whose attributes
      *   should extend the copied `obj`
@@ -322,6 +328,7 @@
      * Partially apply a function
      *
      * @id partial
+     * @group util
      * @param {Function} f
      * @param {args...} - arguments to apply
      * @returns {Function}
