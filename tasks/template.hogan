@@ -19,6 +19,11 @@
           <li><a href="{{repository}}">Source code</a></li>
           <li><a href="{{repository}}/tree/master/README.md">Readme</a></li>
           <li><a href="{{repository}}/tree/master/LICENSE">License ({{license}})</a></li>
+          <li>Examples
+            <ul>
+              <li><a href="examples/space.html">Space</a></li>
+            </ul>
+          </li>
           {{#groups}}
             <li>
               <a href="#{{groupName}}">{{groupName}}</a>
