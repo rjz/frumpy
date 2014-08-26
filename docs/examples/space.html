@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="../frumpy.js"></script>
+    <script src="space.js"></script>
+    <style>
+html, body {
+  background-color:#231f20;
+  margin:0;
+  overflow: hidden;
+}
+
+@-webkit-keyframes cycle {
+  0%   { -webkit-transform: rotate(0); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+.scene {
+  border:1px solid #fff;
+  overflow: hidden;
+  position: absolute;
+  bottom: 10px;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+}
+
+.goon {
+  -webkit-animation: cycle 5s infinite linear;
+  border-radius: 8px;
+  border:1px solid #fff;
+  color: #fff;
+  position: absolute;
+  width: 32px;
+  height: 32px;
+}
+
+.paused .goon {
+  -webkit-animation: none;
+}
+
+.avatar {
+  box-shadow: 0 0 5px #fff;
+  border-radius: 8px;
+  border:2px solid #fff;
+  position: absolute;
+  width: 32px;
+  height: 32px;
+}
+
+.scene .controls {
+  background-color: #231f20;
+  border:1px solid #fff;
+  color: #fff;
+  text-transform: uppercase;
+  position: absolute;
+  z-index: 1;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="scene js-scene">
+      <div class="controls">
+        <p class="js-score"></p>
+      </div>
+    </div>
+  </body>
+</html>
+

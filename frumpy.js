@@ -2,14 +2,16 @@
 
   'use strict';
 
-  var slice = Array.prototype.slice;
-
   var keys = Object.keys;
 
   /**
    * `Frumpy` wraps event handling around the evolving state of an application.
-   * It makes no assumptions about the soure of its events or how the
-   * application itself will be used.
+   * It makes no assumptions about event provenance or how the application
+   * itself will be used--only that the application will need to update its
+   * state in response to certain stimuli.
+   *
+   * Frumpy applications consist of a list of a mapping from event names to
+   * handling procedures.
    *
    * **Handlers** are tuples pairing a `String` label with a collection of one or
    * more callback routines. When an event is attached to the dispatcher using
@@ -17,7 +19,9 @@
    * copy of the application's state and any additional arguments supplied by
    * the originating event. Handlers may either return `undefined` (no changes
    * to the model) or a new JavaScript object representing an updated
-   * application state.
+   * application state. They may be chained: if multiple handlers are attached
+   * to an event, each subsequent handler will receive the transformed state
+   * returned by the previous handler in the chain.
    *
    * **Initial state** is a
    * [POJO](http://en.wikipedia.org/wiki/Plain_Old_Java_Object) containing
@@ -25,10 +29,15 @@
    *
    *     // An event-handling routine
    *     function onClick (model, evt) {
-   *        evt.preventDefault();
-   *        return Frumpy.extend({}, model, {
-   *          clicks: model.clicks + 1
-   *        });
+   *       evt.preventDefault();
+   *       return Frumpy.extend({}, model, {
+   *         clicks: model.clicks + 1
+   *       });
+   *     }
+   *
+   *     // Another routine; no update to state
+   *     function refresh (model) {
+   *       document.querySelector('.counter').innerHTML = model.clicks;
    *     }
    *
    *     // An initial state
@@ -36,26 +45,26 @@
    *
    *     var f = new Frumpy(model0, [
    *       // An event handler
-   *       [ 'click', [ onClick ] ]
+   *       [ 'click', [ onClick, refresh ] ]
    *     ];
    *
-   * New instances of `Frumpy` can now be wired into JavaScript events using
+   * Finally, an event can be bound to the `Frumpy` application by using
    * [`Frumpy::as`](#Frumpy::as):
    *
    *     document.addEventListener('click', f.as('click'));
    *
    * @id Frumpy
    * @type Class
-   * @param {Object} model - the initial state of the dispatcher's model
+   * @param {Object} model - the initial state of the application model
    * @param {Array} handlers - a list of handlers for named events
    *
-   * var f = new Frumpy({ foo: 'bar' }, [
-   *   [ 'fizz', [onFizz, log] ],
-   *   [ 'buzz', [onBuzz, log] ]
+   * var app = new Frumpy({ foo: 'bar' }, [
+   *   [ 'fizz', [onFizz, logFizz] ],
+   *   [ 'buzz', [onBuzz, logBuzz] ]
    * ]);
    *
-   * window.setInterval(f.as('fizz'), 300);
-   * window.setInterval(f.as('buzz'), 500);
+   * window.setInterval(app.as('fizz'), 300);
+   * window.setInterval(app.as('buzz'), 500);
    */
   function Frumpy (model0, uHandlers) {
 
@@ -82,6 +91,7 @@
      *
      * @id Frumpy::as
      * @param {String} name - the name of the event
+     * @returns {Function}
      *
      * var f = new Frumpy({ foo: 'bar' }, [
      *   [ 'model:change', [save] ],
@@ -124,22 +134,27 @@
      */
     this.as = function (name) {
 
-      var matchingHandlers = handlers.filter(partial(isHandlerFor, name));
+      var isHandlerForName = partial(isHandlerFor, name);
 
+      // TODO: passing in a static model makes it impossible to interrupt the
+      //    chain of routines === unpredictable behavior when an interrupt is
+      //    triggered. We either need to queue interrupts or recover the model
+      //    at each step through the chain.
       return function () {
-        var args = slice.call(arguments, 0);
-        var newModel = matchingHandlers
-          .reduce(partial(invokeHandler, args), model);
+        var newModel = handlers
+          .filter(isHandlerForName)
+          .reduce(partial(invokeHandler, slice(arguments)), model);
+
         updateModel(newModel);
       };
     };
 
     /**
-     * Trigger an event on the dispatcher
+     * Schedule an event on the dispatcher to be triggered at next tick
      *
      * @id Frumpy::trigger
      * @param {String} name - the name of the event
-     * @param args... - any additional arguments to forward to the event
+     * @param {args...} - any additional arguments to forward to the event
      *   handling routines
      *
      * var f = new Frumpy({ foo: 'bar' }, [
@@ -154,7 +169,9 @@
      *
      */
     this.trigger = function (name) {
-      return this.as(name).apply(this, rest(arguments));
+      window.setTimeout(function () {
+        return this.as(name).apply(this, rest(arguments));
+      }.bind(this), 0);
     };
 
     // Ensure handler arguments are collections
@@ -168,9 +185,12 @@
     return this;
   }
 
-  // TODO: this is a really lousy implementation of `isEqual`
+  // TODO: this is a *really* lousy implementation of `isEqual`
   function isEqual (o1, o2) {
     var o1Keys, o2Keys;
+    if (o1 === o2) {
+      return true;
+    }
     if (o1 instanceof Object && o2 instanceof Object) {
       o1Keys = keys(o1);
       o2Keys = keys(o2);
@@ -179,18 +199,31 @@
       });
     }
     else {
-      return o1 === o2;
+      return false;
     }
   }
 
+  function slice (arr) {
+    var _slice = Array.prototype.slice;
+    return _slice.apply(arr, _slice.call(arguments, 1));
+  }
+
+  function first (arr) {
+    return slice(arr, 0, 1).pop();
+  }
+
+  function last (arr) {
+    return slice(arr, -1).pop();
+  }
+
   function rest (arr) {
-    return slice.call(arr, 1);
+    return slice(arr, 1);
   }
 
   function partial (fnc) {
     var args = rest(arguments);
     return function () {
-      return fnc.apply(this, args.concat(slice.call(arguments)));
+      return fnc.apply(this, args.concat(slice(arguments)));
     };
   }
 
@@ -203,6 +236,10 @@
       }
     });
     return obj;
+  }
+
+  function copy () {
+    return extend.apply({}, [{}].concat(slice(arguments)));
   }
 
   function isHandlerFor (name, hnd) {
@@ -226,13 +263,39 @@
      * Alias for `Array.prototype.slice`
      *
      * @id slice
+     * @group util
+     * @param {Array} arr
+     * @param {Number} start - starting index
+     * @param {Number} end - final index
+     * @returns {Array}
      */
     slice: slice,
+
+    /**
+     * Retrieve the first item in an `Array`
+     *
+     * @id first
+     * @group util
+     * @param {Array} arr
+     * @returns {Mixed}
+     */
+    first: first,
+
+    /**
+     * Retrieve the last item in an `Array`
+     *
+     * @id last
+     * @group util
+     * @param {Array} arr
+     * @returns {Mixed}
+     */
+    last: last,
 
     /**
      * Retrieve all but the first item in an `Array`
      *
      * @id rest
+     * @group util
      * @param {Array} arr
      * @returns {Array}
      */
@@ -242,6 +305,7 @@
      * Extend an object.
      *
      * @id extend
+     * @group util
      * @param {Object} obj - the base object to extend
      * @param {Object, ...} objs... - additional objects to tack on the end
      * @returns {Object}
@@ -249,11 +313,24 @@
     extend: extend,
 
     /**
+     * Copy an object.
+     *
+     * @id copy
+     * @group util
+     * @param {Object} obj - the base object to copy
+     * @param {Object, ...} objs... - additional objects whose attributes
+     *   should extend the copied `obj`
+     * @returns {Object}
+     */
+    copy: copy,
+
+    /**
      * Partially apply a function
      *
      * @id partial
+     * @group util
      * @param {Function} f
-     * @param args... - arguments to apply
+     * @param {args...} - arguments to apply
      * @returns {Function}
      */
     partial: partial

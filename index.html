@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <title>frumpy</title>
+  </head>
+  <body>
+  <a href="https://github.com/rjz/frumpy"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+    <div class="content">
+      <section class="container">
+        <h1><a name="top"></a>frumpy <small><a href="https://github.com/rjz/frumpy/releases/v0.0.2">v0.0.2</a></small></h1>
+
+        <div>
+          <p>A tiny event dispatcher</p>
+        </div>
+
+        <h3>Contents</h3>
+        <ul>
+          <li><a href="https://github.com/rjz/frumpy">Source code</a></li>
+          <li><a href="https://github.com/rjz/frumpy/tree/master/README.md">Readme</a></li>
+          <li><a href="https://github.com/rjz/frumpy/tree/master/LICENSE">License (WTFPL)</a></li>
+          <li>Examples
+            <ul>
+              <li><a href="examples/space.html">Space</a></li>
+            </ul>
+          </li>
+            <li>
+              <a href="#frumpy">frumpy</a>
+              <ul>
+                <li>
+                  <a href="#frumpy-Frumpy"><code>Frumpy</code></a>
+                </li>
+                <li>
+                  <a href="#frumpy-Frumpy::as"><code>Frumpy::as</code></a>
+                </li>
+                <li>
+                  <a href="#frumpy-Frumpy::trigger"><code>Frumpy::trigger</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#util">util</a>
+              <ul>
+                <li>
+                  <a href="#util-slice"><code>slice</code></a>
+                </li>
+                <li>
+                  <a href="#util-first"><code>first</code></a>
+                </li>
+                <li>
+                  <a href="#util-last"><code>last</code></a>
+                </li>
+                <li>
+                  <a href="#util-rest"><code>rest</code></a>
+                </li>
+                <li>
+                  <a href="#util-extend"><code>extend</code></a>
+                </li>
+                <li>
+                  <a href="#util-copy"><code>copy</code></a>
+                </li>
+                <li>
+                  <a href="#util-partial"><code>partial</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#plugins">plugins</a>
+              <ul>
+                <li>
+                  <a href="#plugins-Frumpy.history"><code>Frumpy.history</code></a>
+                </li>
+                <li>
+                  <a href="#plugins-Frumpy.touch"><code>Frumpy.touch</code></a>
+                </li>
+                <li>
+                  <a href="#plugins-Frumpy.xhr"><code>Frumpy.xhr</code></a>
+                </li>
+              </ul>
+            </li>
+        </ul>
+
+          <hr />
+          <a name="frumpy"></a>
+          <a name="frumpy-Frumpy"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#frumpy">frumpy</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="Frumpy"></a><code>Frumpy</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L7">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p><code>Frumpy</code> wraps event handling around the evolving state of an application.
+It makes no assumptions about event provenance or how the application
+itself will be used--only that the application will need to update its
+state in response to certain stimuli.</p>
+
+<p>Frumpy applications consist of a list of a mapping from event names to
+handling procedures.</p>
+
+<p><strong>Handlers</strong> are tuples pairing a <code>String</code> label with a collection of one or
+more callback routines. When an event is attached to the dispatcher using
+<a href="#Frumpy::as"><code>Frumpy::as</code></a>, each routine is invoked with an immutable
+copy of the application's state and any additional arguments supplied by
+the originating event. Handlers may either return <code>undefined</code> (no changes
+to the model) or a new JavaScript object representing an updated
+application state. They may be chained: if multiple handlers are attached
+to an event, each subsequent handler will receive the transformed state
+returned by the previous handler in the chain.</p>
+
+<p><strong>Initial state</strong> is a
+<a href="http://en.wikipedia.org/wiki/Plain_Old_Java_Object">POJO</a> containing
+the initial state of the program.</p>
+
+<pre><code>// An event-handling routine
+function onClick (model, evt) {
+  evt.preventDefault();
+  return Frumpy.extend({}, model, {
+    clicks: model.clicks + 1
+  });
+}
+
+// Another routine; no update to state
+function refresh (model) {
+  document.querySelector('.counter').innerHTML = model.clicks;
+}
+
+// An initial state
+var model0 = { clicks: 0};
+
+var f = new Frumpy(model0, [
+  // An event handler
+  [ 'click', [ onClick, refresh ] ]
+];
+</code></pre>
+
+<p>Finally, an event can be bound to the <code>Frumpy</code> application by using
+<a href="#Frumpy::as"><code>Frumpy::as</code></a>:</p>
+
+<pre><code>document.addEventListener('click', f.as('click'));
+</code></pre>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Object</code></td>
+                    <td>model</td>
+                    <td>the initial state of the application model</td>
+                  </tr>
+      <tr>
+                    <td><code>Array</code></td>
+                    <td>handlers</td>
+                    <td>a list of handlers for named events</td>
+                  </tr>
+    </table>
+
+                  <h5>Example</h5>
+                  <pre><code>var app = new Frumpy({ foo: &#39;bar&#39; }, [
+  [ &#39;fizz&#39;, [onFizz, logFizz] ],
+  [ &#39;buzz&#39;, [onBuzz, logBuzz] ]
+]);
+
+window.setInterval(app.as(&#39;fizz&#39;), 300);
+window.setInterval(app.as(&#39;buzz&#39;), 500);</code></pre>
+
+              </div>
+            
+            </section>
+            
+          <a name="frumpy-Frumpy::as"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#frumpy">frumpy</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="Frumpy::as"></a><code>Frumpy::as</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L88">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Returns an event listener bound to any matching handlers in the current
+Frumpy instance.</p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>String</code></td>
+                    <td>name</td>
+                    <td>the name of the event</td>
+                  </tr>
+    </table>
+
+                  <h5>Example</h5>
+                  <pre><code>var f = new Frumpy({ foo: &#39;bar&#39; }, [
+  [ &#39;model:change&#39;, [save] ],
+  [ &#39;ajax:load&#39;,    [unbind, onLoad] ]
+  [ &#39;ajax:error&#39;,   [unbind, onError] ]
+]);
+
+function save (model) {
+  var request = new XMLHttpRequest();
+
+  request.open(&#39;POST&#39;, &#39;/states&#39;, true);
+  request.setRequestHeader(&#39;Content-type&#39;, &#39;application/json&#39;);
+
+  request.addEventListener(&#39;load&#39;,  f.as(&#39;ajax:load&#39;));
+  request.addEventListener(&#39;error&#39;, f.as(&#39;ajax:error&#39;));
+
+  request.send(JSON.stringify(model));
+}
+
+function unbind (model, evt) {
+  var request = evt.target;
+  request.removeEventListener(&#39;load&#39;);
+  request.removeEventListener(&#39;error&#39;);
+}
+
+function onLoad (model, evt) {
+  var request = evt.target;
+  if (request.status &gt;= 200 &amp;&amp; request.status &lt; 300) {
+    console.log(&#39;A success!&#39;, req.responseText);
+  }
+  else {
+    console.log(&#39;An error&#39;, req.status);
+  }
+}
+
+function onError () {
+  console.error(&#39;Failed opening connection&#39;);
+}</code></pre>
+
+              </div>
+            
+            </section>
+            
+          <a name="frumpy-Frumpy::trigger"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#frumpy">frumpy</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="Frumpy::trigger"></a><code>Frumpy::trigger</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L152">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Schedule an event on the dispatcher to be triggered at next tick</p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>String</code></td>
+                    <td>name</td>
+                    <td>the name of the event</td>
+                  </tr>
+      <tr>
+                    <td><code>args...</code></td>
+                    <td>-</td>
+                    <td>any additional arguments to forward to the event handling routines</td>
+                  </tr>
+    </table>
+
+                  <h5>Example</h5>
+                  <pre><code>var f = new Frumpy({ foo: &#39;bar&#39; }, [
+  [ &#39;fizz&#39;, [fizz] ]
+];
+
+function fizz (model, arg) {
+  console.log(&#39;fizz&#39;, arg);
+}
+
+f.trigger(&#39;fizz&#39;, 3); // &quot;fizz 3&quot;</code></pre>
+
+              </div>
+            
+            </section>
+            
+          <hr />
+          <a name="util"></a>
+          <a name="util-slice"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#util">util</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="slice"></a><code>slice</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L260">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Return a slice of an array</p>
+
+<p>Alias for <code>Array.prototype.slice</code></p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Array</code></td>
+                    <td>arr</td>
+                    <td></td>
+                  </tr>
+      <tr>
+                    <td><code>Number</code></td>
+                    <td>start</td>
+                    <td>starting index</td>
+                  </tr>
+      <tr>
+                    <td><code>Number</code></td>
+                    <td>end</td>
+                    <td>final index</td>
+                  </tr>
+    </table>
+
+            
+              </div>
+            
+            </section>
+            
+          <a name="util-first"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#util">util</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="first"></a><code>first</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L274">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Retrieve the first item in an <code>Array</code></p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Array</code></td>
+                    <td>arr</td>
+                    <td></td>
+                  </tr>
+    </table>
+
+            
+              </div>
+            
+            </section>
+            
+          <a name="util-last"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#util">util</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="last"></a><code>last</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L284">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Retrieve the last item in an <code>Array</code></p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Array</code></td>
+                    <td>arr</td>
+                    <td></td>
+                  </tr>
+    </table>
+
+            
+              </div>
+            
+            </section>
+            
+          <a name="util-rest"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#util">util</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="rest"></a><code>rest</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L294">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Retrieve all but the first item in an <code>Array</code></p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Array</code></td>
+                    <td>arr</td>
+                    <td></td>
+                  </tr>
+    </table>
+
+            
+              </div>
+            
+            </section>
+            
+          <a name="util-extend"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#util">util</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="extend"></a><code>extend</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L304">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Extend an object.</p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Object</code></td>
+                    <td>obj</td>
+                    <td>the base object to extend</td>
+                  </tr>
+      <tr>
+                    <td><code>Object, ...</code></td>
+                    <td>objs...</td>
+                    <td>additional objects to tack on the end</td>
+                  </tr>
+    </table>
+
+            
+              </div>
+            
+            </section>
+            
+          <a name="util-copy"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#util">util</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="copy"></a><code>copy</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L315">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Copy an object.</p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Object</code></td>
+                    <td>obj</td>
+                    <td>the base object to copy</td>
+                  </tr>
+      <tr>
+                    <td><code>Object, ...</code></td>
+                    <td>objs...</td>
+                    <td>additional objects whose attributes should extend the copied `obj`</td>
+                  </tr>
+    </table>
+
+            
+              </div>
+            
+            </section>
+            
+          <a name="util-partial"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#util">util</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="partial"></a><code>partial</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/frumpy.js#L327">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Partially apply a function</p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Function</code></td>
+                    <td>f</td>
+                    <td></td>
+                  </tr>
+      <tr>
+                    <td><code>args...</code></td>
+                    <td>-</td>
+                    <td>arguments to apply</td>
+                  </tr>
+    </table>
+
+            
+              </div>
+            
+            </section>
+            
+          <hr />
+          <a name="plugins"></a>
+          <a name="plugins-Frumpy.history"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#plugins">plugins</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="Frumpy.history"></a><code>Frumpy.history</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/plugins/history.js#L5">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>History</p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Object</code></td>
+                    <td>app</td>
+                    <td>a Frumpy application</td>
+                  </tr>
+    </table>
+
+                  <h5>Example</h5>
+                  <pre><code>Frumpy.history(app);</code></pre>
+
+              </div>
+            
+            </section>
+            
+          <a name="plugins-Frumpy.touch"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#plugins">plugins</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="Frumpy.touch"></a><code>Frumpy.touch</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/plugins/touch.js#L3">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Touch</p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Object</code></td>
+                    <td>app</td>
+                    <td>a Frumpy application</td>
+                  </tr>
+    </table>
+
+                  <h5>Example</h5>
+                  <pre><code>Frumpy.touch(app, document);</code></pre>
+
+              </div>
+            
+            </section>
+            
+          <a name="plugins-Frumpy.xhr"></a>
+            <section>
+              <header>
+                <ul class="pull-right nav-meta nav-inline">
+                  <li><a href="#plugins">plugins</a></li>
+                  <li><a href="#top">top</a></li>
+                </ul>
+            
+                <h3>
+                  <a name="Frumpy.xhr"></a><code>Frumpy.xhr</code>
+                  <small>(<a href="https://github.com/rjz/frumpy/tree/master/src/plugins/xhr.js#L3">definition</a>)</small>
+                </h3>
+              </header>
+              <div>
+            
+                <p>Bind events from an XHR object to a Frumpy application</p>
+            
+            
+                <h4>Arguments</h4>
+                <table>
+                  <tr>
+                    <th width="15%">Type</th>
+                    <th width="15%">Name</th>
+                    <th width="60%">Description</th>
+                  </tr>
+                  <tr>
+                    <td><code>Object</code></td>
+                    <td>app</td>
+                    <td>the Frumpy application to subscribe to XHR events</td>
+                  </tr>
+    </table>
+
+                  <h5>Example</h5>
+                  <pre><code>var app = new Frumpy(state0, [
+  [ &#39;xhr:load&#39;,  [onXhrLoad] ],
+  [ &#39;xhr:error&#39;, [onXhrError] ]
+]);
+
+function onXhrLoad (model, req) {
+  console.log(req.status);
+}
+
+function onXhrError (model, xhr) {
+  console.log(&#39;failed establishing connection&#39;);
+}
+
+var xhr = Frumpy.xhr(app);
+xhr.open(&#39;post&#39;, &#39;/items&#39;);
+xhr.send({ foo: &#39;bar&#39; });</code></pre>
+
+              </div>
+            
+            </section>
+            
+
+      </section>
+    </div>
+    <footer class="dark">
+      <p class="copyright">
+        Another unrepentant production from <a href="http://rjzaworski.com">rj zaworski</a>
+      </p>
+    </footer>
+  </body>
+</html>
+
