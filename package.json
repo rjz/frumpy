@@ -1,6 +1,6 @@
 {
   "name": "frumpy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A tiny event dispatcher",
   "main": "src/frumpy.js",
   "scripts": {
