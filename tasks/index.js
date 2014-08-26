@@ -75,6 +75,7 @@ module.exports.docs = function (patterns) {
     groups      : transformFiles(files),
     repository  : packageJson.repository.url,
     name        : packageJson.name,
+    version     : packageJson.version,
     license     : packageJson.license,
     description : packageJson.description
   }, templates);

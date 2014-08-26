@@ -7,7 +7,8 @@
     "start": "node -e 'require(\"./tasks\").server()'",
     "docs": "node -e 'require(\"./tasks\").docs([\"src/frumpy.js\",\"src/plugins/*.js\"])' && cp -r src/* docs",
     "test": "./node_modules/jshint/bin/jshint src/**/*.js && ./node_modules/mocha/bin/mocha",
-    "uglify": "./node_modules/uglify-js/bin/uglifyjs src/frumpy.js > frumpy.min.js"
+    "uglify": "./node_modules/uglify-js/bin/uglifyjs src/frumpy.js > frumpy.min.js",
+    "pages": "bash tasks/rebuild-gh-pages.sh"
   },
   "repository": {
     "type": "git",
