@@ -136,5 +136,23 @@ describe('Frumpy::trigger', function () {
 
     f.trigger('fizz', 3);
   });
+
+  it('Calls handlers in order', function (done) {
+
+    var preHandler = function (model, arg) {
+      return { arg: arg };
+    };
+
+    var handler = function (model) {
+      assert.equal(model.arg, 'Aaaargh!');
+      done();
+    };
+
+    var f = new Frumpy({}, [
+      [ 'fizz', [ preHandler, handler ] ]
+    ]);
+
+    f.trigger('fizz', 'Aaaargh!');
+  });
 });
 
