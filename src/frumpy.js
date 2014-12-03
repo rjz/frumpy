@@ -169,7 +169,7 @@
      *
      */
     this.trigger = function (name) {
-      window.setTimeout(function () {
+      setTimeout(function () {
         return this.as(name).apply(this, rest(arguments));
       }.bind(this), 0);
     };
