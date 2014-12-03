@@ -4,6 +4,9 @@ A tiny (<1k) event dispatcher with very few features and opinions.
 
 [http://rjz.github.io/frumpy](http://rjz.github.io/frumpy)
 
+[![Build
+Status](https://travis-ci.org/rjz/frumpy.svg)](https://travis-ci.org/rjz/frumpy)
+
 ### Example
 
 Write some routines that interact with the application model.
