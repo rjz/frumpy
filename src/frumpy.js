@@ -169,8 +169,9 @@
      *
      */
     this.trigger = function (name) {
+      var args = rest(arguments);
       setTimeout(function () {
-        return this.as(name).apply(this, rest(arguments));
+        return this.as(name).apply(this, args);
       }.bind(this), 0);
     };
 

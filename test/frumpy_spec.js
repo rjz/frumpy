@@ -121,3 +121,20 @@ describe('Frumpy', function () {
   });
 });
 
+describe('Frumpy::trigger', function () {
+
+  it('Calls handler with arguments', function (done) {
+
+    var handler = function (model, arg) {
+      assert.equal(arg, 3);
+      done();
+    };
+
+    var f = new Frumpy({}, [
+      [ 'fizz', [ handler ] ]
+    ]);
+
+    f.trigger('fizz', 3);
+  });
+});
+
